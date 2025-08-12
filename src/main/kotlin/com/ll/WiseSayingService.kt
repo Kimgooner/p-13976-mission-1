@@ -16,13 +16,21 @@ class WiseSayingService {
         return textToData(json)
     }
 
-    fun findAll(): List<WiseSaying> {
+    fun findAll(keywordType: String = "", keyword: String = ""): List<WiseSaying> {
         val jsons: List<String> = wiseSayingRepository.loadAll()
-        var result = mutableListOf<WiseSaying>()
-        for (json: String in jsons) {
-            result.add(textToData(json))
+        val allList = jsons.map { json -> textToData(json) }
+
+        if (keywordType.isBlank()) {
+            return allList
         }
-        return result
+
+        return allList.filter { w ->
+            if (keywordType == "author") {
+                w.author.contains(keyword)
+            } else {
+                w.content.contains(keyword)
+            }
+        }
     }
 
     fun textToData(json: String): WiseSaying{

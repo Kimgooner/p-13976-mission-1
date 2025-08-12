@@ -16,25 +16,13 @@ class WiseSayingController {
     }
 
     fun readWiseSaying(keywordType: String, keyword: String, page: Int) {
-        val list = wiseSayingService.findAll()
+        val filteredList = wiseSayingService.findAll(keywordType, keyword)
 
-        val filteredList = if (keywordType.isEmpty()) {
-            list
-        } else {
+        if (!keywordType.isBlank()) {
             println("----------------------")
-            print("검색타입 : ")
-            println(keywordType)
-            print("검색어 : ")
-            println(keyword)
+            println("검색타입 : $keywordType")
+            println("검색어 : $keyword")
             println("----------------------")
-
-            list.filter { w ->
-                if (keywordType == "author") {
-                    w.author.contains(keyword)
-                } else {
-                    w.content.contains(keyword)
-                }
-            }
         }
 
         println("번호 / 작가 / 명언")
@@ -47,12 +35,10 @@ class WiseSayingController {
         filteredList.subList(fromIndex, toIndex).forEach { it.print() }
 
         print("페이지 : ")
-        val maxPage = (filteredList.size / 5) + 1
-        for(i in 1 until maxPage) {
-            if(i == page) print("[$i]")
-            else print("$i")
-
-            if(i != maxPage-1) print(" / ")
+        val maxPage = (filteredList.size + pageSize - 1) / pageSize  // 올림 계산
+        for (i in 1..maxPage) {
+            if (i == page) print("[$i]") else print("$i")
+            if (i != maxPage) print(" / ")
         }
         println()
     }
